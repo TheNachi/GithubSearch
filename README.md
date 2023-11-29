@@ -6,19 +6,16 @@ iOS application for searching GitHub repositories and retrieving user informatio
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
 - [Installation](#installation)
-- [Usage](#usage)
-- [Tests](#tests)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Introduction
 
-GithubSearch is an iOS app developed for searching GitHub repositories and retrieving user information.. The app fetches repository and user information information based on search.
+GithubSearch is an iOS app developed for searching GitHub repositories and retrieving user information. The app fetches repository and user information information based on search.
 
 ## Getting Started
 
-To get started with MoviesTrend, follow the installation instructions in the next section.
+To get started with GithubSearch, follow the installation instructions in the next section.
 
 ## Installation
 
