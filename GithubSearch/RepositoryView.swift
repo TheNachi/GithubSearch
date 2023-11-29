@@ -54,6 +54,13 @@ struct RepositoryView: View {
                 }
             }
         }
+        .alert(isPresented: $viewModel.showAlert) {
+            Alert(
+                title: Text("Error"),
+                message: Text(viewModel.alertMessage),
+                dismissButton: .default(Text("OK"))
+            )
+        }
     }
 }
 
@@ -142,8 +149,8 @@ struct RepositoryCell: View {
                     .multilineTextAlignment(.leading)
             }
             
-            if let lastUpdated = formatDate(repository.updated_at) {
-                Text(lastUpdated)
+            if let lastUpdated = Date().formattedDateString(from: repository.updated_at) {
+                Text("Updated \(lastUpdated) ago")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.leading)
@@ -154,31 +161,6 @@ struct RepositoryCell: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
         .background(RoundedRectangle(cornerRadius: 4).stroke(Color(hex: 0xD9D9D9), lineWidth: 1))
-    }
-    
-    private func formatDate(_ dateString: String) -> String? {
-        let dateFormatter = ISO8601DateFormatter()
-        if let date = dateFormatter.date(from: dateString) {
-            let now = Date()
-            let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date, to: now)
-            
-            if let year = components.year, year > 0 {
-                return "Updated \(year) " + (year == 1 ? "year ago" : "years ago")
-            } else if let month = components.month, month > 0 {
-                return "Updated \(month) " + (month == 1 ? "month ago" : "months ago")
-            } else if let day = components.day, day > 0 {
-                return "Updated \(day) " + (day == 1 ? "day ago" : "days ago")
-            } else if let hour = components.hour, hour > 0 {
-                return "Updated \(hour) " + (hour == 1 ? "hour ago" : "hours ago")
-            } else if let minute = components.minute, minute > 0 {
-                return "Updated \(minute) " + (minute == 1 ? "minute ago" : "minutes ago")
-            } else if let second = components.second, second > 0 {
-                return "Updated \(second) " + (second == 1 ? "second ago" : "seconds ago")
-            } else {
-                return "Updated just now"
-            }
-        }
-        return nil
     }
 }
 
@@ -246,5 +228,46 @@ struct SearchBarView: View {
         }
         .padding(6)
         .background(RoundedRectangle(cornerRadius: 8).stroke(Color(hex: 0xD9D9D9), lineWidth: 1))
+    }
+}
+
+extension Date {
+    func formattedDateString(from dateString: String) -> String? {
+        let dateFormatter = ISO8601DateFormatter()
+        if let date = dateFormatter.date(from: dateString) {
+            let now = Date()
+            let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date, to: now)
+            
+            if let year = components.year, year > 0 {
+                return "\(year) " + (year == 1 ? "year" : "years")
+            } else if let month = components.month, month > 0 {
+                return "\(month) " + (month == 1 ? "month" : "months")
+            } else if let day = components.day, day > 0 {
+                return "\(day) " + (day == 1 ? "day" : "days")
+            } else if let hour = components.hour, hour > 0 {
+                return "\(hour) " + (hour == 1 ? "hour" : "hours")
+            } else if let minute = components.minute, minute > 0 {
+                return "\(minute) " + (minute == 1 ? "minute" : "minutes")
+            } else if let second = components.second, second > 0 {
+                return "\(second) " + (second == 1 ? "second" : "seconds")
+            } else {
+                return "just now"
+            }
+        }
+        return nil
+    }
+}
+
+class AlertManager: ObservableObject {
+    static let shared = AlertManager()
+
+    @Published var showAlert = false
+    @Published var alertTitle = ""
+    @Published var alertMessage = ""
+
+    func showAlert(title: String, message: String) {
+        alertTitle = title
+        alertMessage = message
+        showAlert = true
     }
 }

@@ -129,6 +129,13 @@ struct UserDetailView: View {
                 viewModel.loadRepositories(url: reposURL)
             }
         }
+        .alert(isPresented: $viewModel.showAlert) {
+            Alert(
+                title: Text("Error"),
+                message: Text(viewModel.alertMessage),
+                dismissButton: .default(Text("OK"))
+            )
+        }
         
     }
     

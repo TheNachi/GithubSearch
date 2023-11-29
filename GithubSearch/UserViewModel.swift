@@ -14,9 +14,17 @@ class UserViewModel: ObservableObject {
     @Published var selectedUser: User?
     @Published var userDetailViewModel = UserDetailViewModel()
     @Published var isUserDetailActive: Bool = false
+    @Published var showAlert: Bool = false
+    var alertMessage: String = ""
+    
     
     func findUsers() {
         if username.count < 3 {
+            DispatchQueue.main.async {
+                self.alertMessage = "Search input has to be more than 2 characters"
+                self.showAlert = true
+                
+            }
             return
         }
         
@@ -29,6 +37,8 @@ class UserViewModel: ObservableObject {
                     self.users = users
                 case .failure(let error):
                     print("Error searching users: \(error)")
+                    self.alertMessage = "Failed to fetch users.: \(error)"
+                    self.showAlert = true
                 }
             }
         }
@@ -45,6 +55,8 @@ class UserViewModel: ObservableObject {
                         self.isUserDetailActive = true
                     case .failure(let error):
                         print("Error fetching user details: \(error)")
+                        self.alertMessage = "Failed to fetch user details.: \(error)"
+                        self.showAlert = true
                     }
                 }
             }
