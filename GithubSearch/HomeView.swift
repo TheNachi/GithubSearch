@@ -19,48 +19,16 @@ struct HomeView: View {
                         .fontWeight(.semibold)
 
                     HStack(spacing: 20) {
-                        Button(action: {
+                        ButtonView(imageName: "userIcon",
+                                   title: "Users",
+                                   backgroundColor: Color(hex: 0xECF5F8)) {
                             selectedTab = 2
-                        }) {
-                            VStack(alignment: .leading) {
-                                Image("userIcon")
-                                    .foregroundColor(.black)
-                                    .padding(.top, 15)
-                                    
-                                Spacer()
-                                Text("Users")
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.black)
-                                    .padding(.bottom, 10)
-                            }
-                            .padding(.leading, 15)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .frame(height: 118)
-                            .background(Color(hex: 0xECF5F8))
-                            .border(Color(hex: 0xD9D9D9), width: 0.4)
-                            .cornerRadius(8)
                         }
 
-                        Button(action: {
+                        ButtonView(imageName: "repositoriesIcon",
+                                   title: "Repositories",
+                                   backgroundColor: Color(hex: 0xF6EDF8)) {
                             selectedTab = 1
-                        }) {
-                            VStack(alignment: .leading) {
-                                Image("repositoriesIcon")
-                                    .foregroundColor(.black)
-                                    .padding(.top, 15)
-                                
-                                Spacer()
-                                Text("Repositories")
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.black)
-                                    .padding(.bottom, 10)
-                            }
-                            .padding(.leading, 15)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .frame(height: 118)
-                            .background(Color(hex: 0xF6EDF8))
-                            .border(Color(hex: 0xD9D9D9), width: 0.4)
-                            .cornerRadius(8)
                         }
                     }
                     .padding(.top, 30)
@@ -72,6 +40,35 @@ struct HomeView: View {
             }
             .navigationTitle("Home")
             .navigationBarHidden(true)
+        }
+    }
+}
+
+struct ButtonView: View {
+    let imageName: String
+    let title: String
+    let backgroundColor: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading) {
+                Image(imageName)
+                    .foregroundColor(.black)
+                    .padding(.top, 15)
+                    
+                Spacer()
+                Text(title)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.black)
+                    .padding(.bottom, 10)
+            }
+            .padding(.leading, 15)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(height: 118)
+            .background(backgroundColor)
+            .border(Color(hex: 0xD9D9D9), width: 0.4)
+            .cornerRadius(8)
         }
     }
 }

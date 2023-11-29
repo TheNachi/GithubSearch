@@ -6,12 +6,10 @@
 //
 
 import Foundation
-
 import SwiftUI
 
 class GitHubAPIManager {
     static let shared = GitHubAPIManager()
-    private let baseURL = "https://api.github.com"
 
     enum APIError: Error {
         case invalidURL
@@ -23,7 +21,7 @@ class GitHubAPIManager {
 
     func searchRepositories(query: String, page: Int = 1, completion: @escaping (Result<[Repository], APIError>) -> Void) {
         let endpoint = "/search/repositories"
-        let parameters = ["q": query, "page": "\(page)"]
+        let parameters = ["q": query, "page": "\(page)", "per_page": APIConstants.perPage]
 
         performRequest(endpoint: endpoint, parameters: parameters) { result in
             switch result {
@@ -44,7 +42,7 @@ class GitHubAPIManager {
 
     func searchUsers(query: String, page: Int = 1, completion: @escaping (Result<[User], APIError>) -> Void) {
         let endpoint = "/search/users"
-        let parameters = ["q": query, "page": "\(page)"]
+        let parameters = ["q": query, "page": "\(page)", "per_page": APIConstants.perPage]
 
         performRequest(endpoint: endpoint, parameters: parameters) { result in
             switch result {
@@ -82,27 +80,27 @@ class GitHubAPIManager {
     
     // MARK: - Get Repositories
 
-        func getRepositories(url: String, completion: @escaping (Result<[Repository], APIError>) -> Void) {
-            guard let reposURL = URL(string: url) else {
-                completion(.failure(.invalidURL))
-                return
-            }
+    func getRepositories(url: String, completion: @escaping (Result<[Repository], APIError>) -> Void) {
+        guard let reposURL = URL(string: url) else {
+            completion(.failure(.invalidURL))
+            return
+        }
 
-            performRequest(url: reposURL) { result in
-                switch result {
-                case .success(let data):
-                    do {
-                        let repositories = try JSONDecoder().decode([Repository].self, from: data)
-                        completion(.success(repositories))
-                    } catch {
-                        print("Error decoding repositories: \(error)")
-                        completion(.failure(.decodingError))
-                    }
-                case .failure(let error):
-                    completion(.failure(error))
+        performRequest(url: reposURL) { result in
+            switch result {
+            case .success(let data):
+                do {
+                    let repositories = try JSONDecoder().decode([Repository].self, from: data)
+                    completion(.success(repositories))
+                } catch {
+                    print("Error decoding repositories: \(error)")
+                    completion(.failure(.decodingError))
                 }
+            case .failure(let error):
+                completion(.failure(error))
             }
         }
+    }
 
     // MARK: - Private Methods
 
@@ -130,22 +128,24 @@ class GitHubAPIManager {
     }
 
     private func makeURL(endpoint: String, parameters: [String: String]) -> URL? {
-        var urlComponents = URLComponents(string: baseURL + endpoint)
+        var urlComponents = URLComponents(string: APIConstants.baseURL + endpoint)
         urlComponents?.queryItems = parameters.map { URLQueryItem(name: $0, value: $1) }
         return urlComponents?.url
     }
 
     private func setupCommonHeaders(for request: inout URLRequest) {
         request.addValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
-        // Add authentication header if needed
-        // request.addValue("Bearer <YOUR_TOKEN>", forHTTPHeaderField: "Authorization")
     }
 }
-
-
 
 struct SearchResult<T: Codable>: Codable {
     let total_count: Int
     let incomplete_results: Bool
     let items: [T]
+}
+
+
+struct APIConstants {
+    static let baseURL = "https://api.github.com"
+    static let perPage = "100"
 }

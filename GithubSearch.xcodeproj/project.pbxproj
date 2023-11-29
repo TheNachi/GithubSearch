@@ -21,6 +21,9 @@
 		BAE791E12B13F898009D0A18 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE791E02B13F897009D0A18 /* User.swift */; };
 		BAE791E32B1404E8009D0A18 /* GitHubAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE791E22B1404E8009D0A18 /* GitHubAPIManager.swift */; };
 		BAEE39302B166A520022C8E8 /* UserDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAEE392F2B166A520022C8E8 /* UserDetailView.swift */; };
+		BAEE39322B175AE40022C8E8 /* RepositoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAEE39312B175AE40022C8E8 /* RepositoryViewModel.swift */; };
+		BAEE39342B175AF20022C8E8 /* UserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAEE39332B175AF20022C8E8 /* UserViewModel.swift */; };
+		BAEE39362B175B040022C8E8 /* UserDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAEE39352B175B040022C8E8 /* UserDetailViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +61,9 @@
 		BAE791E02B13F897009D0A18 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		BAE791E22B1404E8009D0A18 /* GitHubAPIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubAPIManager.swift; sourceTree = "<group>"; };
 		BAEE392F2B166A520022C8E8 /* UserDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailView.swift; sourceTree = "<group>"; };
+		BAEE39312B175AE40022C8E8 /* RepositoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryViewModel.swift; sourceTree = "<group>"; };
+		BAEE39332B175AF20022C8E8 /* UserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewModel.swift; sourceTree = "<group>"; };
+		BAEE39352B175B040022C8E8 /* UserDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +119,9 @@
 				BAE791D82B13F491009D0A18 /* HomeView.swift */,
 				BAE791DA2B13F4BD009D0A18 /* RepositoryView.swift */,
 				BAE791DC2B13F7F5009D0A18 /* UsersView.swift */,
+				BAEE39312B175AE40022C8E8 /* RepositoryViewModel.swift */,
+				BAEE39332B175AF20022C8E8 /* UserViewModel.swift */,
+				BAEE39352B175B040022C8E8 /* UserDetailViewModel.swift */,
 				BAEE392F2B166A520022C8E8 /* UserDetailView.swift */,
 				BAE791E22B1404E8009D0A18 /* GitHubAPIManager.swift */,
 				BAE791DE2B13F876009D0A18 /* Repository.swift */,
@@ -279,9 +288,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				BAE791D92B13F491009D0A18 /* HomeView.swift in Sources */,
+				BAEE39342B175AF20022C8E8 /* UserViewModel.swift in Sources */,
 				BAE791E32B1404E8009D0A18 /* GitHubAPIManager.swift in Sources */,
+				BAEE39322B175AE40022C8E8 /* RepositoryViewModel.swift in Sources */,
 				BAE791B12B13F0D1009D0A18 /* ContentView.swift in Sources */,
 				BAE791DD2B13F7F5009D0A18 /* UsersView.swift in Sources */,
+				BAEE39362B175B040022C8E8 /* UserDetailViewModel.swift in Sources */,
 				BAEE39302B166A520022C8E8 /* UserDetailView.swift in Sources */,
 				BAE791DB2B13F4BD009D0A18 /* RepositoryView.swift in Sources */,
 				BAE791AF2B13F0D1009D0A18 /* GithubSearchApp.swift in Sources */,

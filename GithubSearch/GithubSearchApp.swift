@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct GithubSearchApp: App {
-    @State private var selectedTab = 0 // 0 for Home, 1 for Repositories, 2 for Users
+    @State private var selectedTab = 0
 
     var body: some Scene {
         WindowGroup {

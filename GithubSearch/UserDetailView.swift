@@ -10,14 +10,12 @@ import SwiftUI
 
 struct UserDetailView: View {
     @Environment(\.presentationMode) var presentationMode
-    var user: User?
-    @State private var repositories: [Repository] = []
-    @State private var isLoading: Bool = false
+    @StateObject var viewModel: UserDetailViewModel
     
     var body: some View {
         VStack(alignment: .leading) {
             HStack(alignment: .top, spacing: 8) {
-                if let ownerAvatarURL = user?.avatar_url, let url = URL(string: ownerAvatarURL) {
+                if let ownerAvatarURL = viewModel.user?.avatar_url, let url = URL(string: ownerAvatarURL) {
                     AsyncImage(url: url) { phase in
                         switch phase {
                         case .success(let image):
@@ -44,12 +42,12 @@ struct UserDetailView: View {
                 }
                 
                 VStack(alignment: .leading) {
-                    Text(user?.name ?? "")
+                    Text(viewModel.user?.name ?? "")
                         .font(.system(size: 16))
                         .fontWeight(.semibold)
                         .lineLimit(1)
                     
-                    Text(user?.login ?? "")
+                    Text(viewModel.user?.login ?? "")
                         .font(.system(size: 14))
                         .lineLimit(1)
                 }
@@ -58,40 +56,47 @@ struct UserDetailView: View {
             }
             .padding(.bottom, 10)
             
-            Text(user?.bio ?? "")
+            Text(viewModel.user?.bio ?? "NO BIO")
                 .font(.system(size: 12))
                 .multilineTextAlignment(.leading)
                 .padding(.bottom, 10)
             
             HStack(spacing: 6) {
-                Image("locationIcon")
-                    .frame(width: 10, height: 10)
-                Text(user?.location ?? "")
-                    .font(.system(size: 10))
-                    .foregroundColor(.gray)
+                if let location = viewModel.user?.location {
+                    Image("locationIcon")
+                        .frame(width: 10, height: 10)
+                    Text(location)
+                        .font(.system(size: 10))
+                        .foregroundColor(.gray)
+                        .padding(.trailing, 8)
+                        .lineLimit(1)
+                }
                 
-                Image("linkIcon")
-                    .frame(width: 10, height: 10)
-                Text(user?.blog ?? "")
-                    .font(.system(size: 10))
-                    .foregroundColor(.gray)
+                if !(viewModel.user?.blog ?? "").isEmpty {
+                    Image("linkIcon")
+                        .frame(width: 10, height: 10)
+                    Text(viewModel.user?.blog ?? "")
+                        .font(.system(size: 10))
+                        .fontWeight(.semibold)
+                        .lineLimit(1)
+                }
             }
             .padding(.bottom, 10)
             
             HStack(spacing: 6) {
                 Image("peopleIcon")
                     .frame(width: 10, height: 10)
-                Text("\(user?.followers ?? 0) followers   .")
+                Text("\(viewModel.user?.followers ?? 0) followers   .")
                     .font(.system(size: 10))
                     .foregroundColor(.gray)
                 
-                Text("\(user?.following ?? 0) following")
+                Text("\(viewModel.user?.following ?? 0) following")
                     .font(.system(size: 10))
                     .foregroundColor(.gray)
             }
             .padding(.bottom, 20)
             
-            Text("Repositories  \(repositories.count)")
+            Text("Repositories  \(viewModel.repositories.count)")
                 .font(.system(size: 10))
                 .fontWeight(.semibold)
             
@@ -99,16 +104,20 @@ struct UserDetailView: View {
             
             Spacer()
             
-            if isLoading {
-                ProgressView()
-                    .padding()
-            } else {
+            if !viewModel.repositories.isEmpty {
                 ScrollView(showsIndicators: false) {
-                    ForEach(repositories, id: \.id) { repo in
+                    ForEach(viewModel.repositories, id: \.id) { repo in
                         RepositoryCell(repository: repo)
                         
                     }
                 }
+            }
+            
+            if viewModel.repositories.isEmpty {
+                InformationMessageView(imageName: "noRepoIcon", message: "This user  doesn’t have repositories yet, come back later :-)")
+                    .frame(maxWidth: .infinity, alignment: .center)
+                
+                Spacer()
             }
         }
         .navigationBarTitle("", displayMode: .inline)
@@ -116,9 +125,8 @@ struct UserDetailView: View {
         .navigationBarItems(leading: backButton)
         .padding(.horizontal, 20)
         .onAppear {
-            // Load repositories when the view appears
-            if let reposURL = user?.repos_url {
-                loadRepositories(url: reposURL)
+            if let reposURL = viewModel.user?.repos_url {
+                viewModel.loadRepositories(url: reposURL)
             }
         }
         
@@ -132,19 +140,6 @@ struct UserDetailView: View {
                 Image(systemName: "chevron.backward")
                 Text("Users")
             }
-        }
-    }
-    
-    private func loadRepositories(url: String) {
-        isLoading = true
-        GitHubAPIManager.shared.getRepositories(url: url) { result in
-            switch result {
-            case .success(let repos):
-                self.repositories = repos
-            case .failure(let error):
-                print("Error loading repositories: \(error)")
-            }
-            isLoading = false
         }
     }
 }

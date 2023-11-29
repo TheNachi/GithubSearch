@@ -8,14 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
-    // Properties
     @Binding var selectedTab: Int
     
-    // Initializer
     init(selectedTab: Binding<Int>) {
         self._selectedTab = selectedTab
         
-        // Customize UITabBar appearance
         let image = UIImage.gradientImageWithBounds(
             bounds: CGRect(x: 0, y: 0, width: UIScreen.main.scale, height: 8),
             colors: [
@@ -34,14 +31,11 @@ struct ContentView: View {
         UITabBar.appearance().standardAppearance = appearance
     }
     
-    // Body
     var body: some View {
         ZStack {
-            // Background with shadow
             Color.black
                 .shadow(color: .black, radius: 5, x: 0, y: 5)
             
-            // TabView
             TabView(selection: $selectedTab) {
                 HomeView(selectedTab: $selectedTab)
                     .tabItem {

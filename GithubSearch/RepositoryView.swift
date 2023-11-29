@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct RepositoryView: View {
-    @State private var searchText: String = ""
-    @State private var repositories: [Repository] = []
-    @State private var isLoading: Bool = false
+    @StateObject var viewModel = RepositoryViewModel()
     
     var body: some View {
         ZStack {
@@ -19,62 +17,41 @@ struct RepositoryView: View {
                     .fontWeight(.semibold)
                     .font(.system(size: 20))
                 
-                HStack {
-                    Image("searchIcon")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 15, height: 15)
-                        .foregroundColor(.gray)
-                        .padding(.leading, 8)
-                    
-                    TextField("Search for repositories...", text: $searchText)
-                        .font(.system(size: 14))
-                        .padding(.vertical, 8)
-                    
-                    Button(action: searchRepositories) {
-                        Text("Search")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 24)
-                            .padding(.vertical, 10)
-                            .background(RoundedRectangle(cornerRadius: 4).fill(Color.black))
-                    }
-                }
-                .padding(6)
-                .background(RoundedRectangle(cornerRadius: 8).stroke(Color(hex: 0xD9D9D9), lineWidth: 1))
+                SearchBarView(searchText: $viewModel.searchText,
+                              placeholder: "Search for repositories...",
+                              action: viewModel.searchRepositories)
                 
-                
-                if isLoading {
+                if viewModel.isLoading {
+                    Spacer()
+                    
                     ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .blue))
+                        .scaleEffect(2)
                         .padding()
+                        .frame(maxWidth: .infinity, alignment: .center)
                 } else {
                     ScrollView(showsIndicators: false) {
-                        ForEach(repositories, id: \.id) { repo in
+                        ForEach(viewModel.repositories, id: \.id) { repo in
                             RepositoryCell(repository: repo)
-                            
                         }
                     }
                 }
+                
                 Spacer()
             }
             
-            if repositories.isEmpty && !isLoading {
+            if viewModel.repositories.isEmpty && !viewModel.isLoading {
                 InformationMessageView(imageName: "searchImage", message: "Search Github for repositories, issues and pull requests!")
             }
         }
-        .padding()
+        .padding(.horizontal)
+        .padding(.top, 20)
         .navigationBarHidden(true)
-    }
-    
-    private func searchRepositories() {
-        isLoading = true
-        GitHubAPIManager.shared.searchRepositories(query: searchText) { result in
-            isLoading = false
-            switch result {
-            case .success(let repositories):
-                self.repositories = repositories
-            case .failure(let error):
-                print("Error searching users: \(error)")
+        .onAppear {
+            NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: nil, queue: .main) { _ in
+                if viewModel.searchText.count < 3 && viewModel.repositories.count > 0 {
+                    viewModel.repositories.removeAll()
+                }
             }
         }
     }
@@ -85,7 +62,7 @@ struct RepositoryView: View {
 struct InformationMessageView: View {
     var imageName: String
     var message: String
-
+    
     var body: some View {
         VStack {
             Image(imageName)
@@ -102,12 +79,11 @@ struct InformationMessageView: View {
     }
 }
 
-
 struct RepositoryCell: View {
     var repository: Repository
-
+    
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 8) {
                 if let ownerAvatarURL = repository.owner?.avatar_url, let url = URL(string: ownerAvatarURL) {
                     AsyncImage(url: url) { phase in
@@ -135,9 +111,8 @@ struct RepositoryCell: View {
                     EmptyView()
                 }
                 
-                Text(repository.full_name)
-                    .font(.system(size: 12))
-                    .lineLimit(1)
+                RepositoryNameView(repositoryName: repository.full_name)
+                
                 
                 Spacer()
                 
@@ -166,9 +141,110 @@ struct RepositoryCell: View {
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.leading)
             }
+            
+            if let lastUpdated = formatDate(repository.updated_at) {
+                Text(lastUpdated)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.leading)
+            }
+            
+            
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
         .background(RoundedRectangle(cornerRadius: 4).stroke(Color(hex: 0xD9D9D9), lineWidth: 1))
+    }
+    
+    private func formatDate(_ dateString: String) -> String? {
+        let dateFormatter = ISO8601DateFormatter()
+        if let date = dateFormatter.date(from: dateString) {
+            let now = Date()
+            let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date, to: now)
+            
+            if let year = components.year, year > 0 {
+                return "Updated \(year) " + (year == 1 ? "year ago" : "years ago")
+            } else if let month = components.month, month > 0 {
+                return "Updated \(month) " + (month == 1 ? "month ago" : "months ago")
+            } else if let day = components.day, day > 0 {
+                return "Updated \(day) " + (day == 1 ? "day ago" : "days ago")
+            } else if let hour = components.hour, hour > 0 {
+                return "Updated \(hour) " + (hour == 1 ? "hour ago" : "hours ago")
+            } else if let minute = components.minute, minute > 0 {
+                return "Updated \(minute) " + (minute == 1 ? "minute ago" : "minutes ago")
+            } else if let second = components.second, second > 0 {
+                return "Updated \(second) " + (second == 1 ? "second ago" : "seconds ago")
+            } else {
+                return "Updated just now"
+            }
+        }
+        return nil
+    }
+}
+
+struct RepositoryNameView: View {
+    var repositoryName: String
+    
+    var body: some View {
+        let parts = repositoryName.components(separatedBy: "/")
+        if parts.count == 2 {
+            return AnyView(
+                HStack {
+                    Text(parts[0])
+                        .font(.system(size: 12))
+                        .foregroundColor(.purple)
+                        .lineLimit(1)
+                    Text("/")
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
+                        .padding(.leading, -6)
+                    Text(parts[1])
+                        .font(.system(size: 12))
+                        .foregroundColor(.black)
+                        .lineLimit(1)
+                        .padding(.leading, -9)
+                }
+            )
+        } else {
+            return AnyView(
+                Text(repositoryName)
+                    .font(.system(size: 12))
+                    .foregroundColor(.black)
+                    .lineLimit(1)
+            )
+        }
+    }
+}
+
+
+struct SearchBarView: View {
+    @Binding var searchText: String
+    let placeholder: String
+    let action: () -> Void
+    
+    var body: some View {
+        HStack {
+            Image("searchIcon")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 15, height: 15)
+                .foregroundColor(.gray)
+                .padding(.leading, 8)
+            
+            TextField(placeholder, text: $searchText)
+                .font(.system(size: 14))
+                .padding(.vertical, 8)
+            
+            Button(action: action) {
+                Text("Search")
+                    .font(.subheadline)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 10)
+                    .background(RoundedRectangle(cornerRadius: 4).fill(Color.black))
+            }
+        }
+        .padding(6)
+        .background(RoundedRectangle(cornerRadius: 8).stroke(Color(hex: 0xD9D9D9), lineWidth: 1))
     }
 }
