@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 struct User: Codable, Identifiable {
     let id: Int
     let login: String

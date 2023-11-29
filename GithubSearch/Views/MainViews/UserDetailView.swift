@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct UserDetailView: View {
     @Environment(\.presentationMode) var presentationMode
     @StateObject var viewModel: UserDetailViewModel

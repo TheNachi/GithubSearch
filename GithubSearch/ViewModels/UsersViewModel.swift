@@ -7,7 +7,7 @@
 
 import Foundation
 
-class UserViewModel: ObservableObject {
+class UsersViewModel: ObservableObject {
     @Published var username: String = ""
     @Published var users: [User] = []
     @Published var isLoading: Bool = false
